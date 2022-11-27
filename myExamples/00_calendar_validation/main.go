@@ -106,15 +106,15 @@ func main() {
 			panic(err)
 		}
 		fromConfirmPrompt := promptui.Prompt{
-			Label:     fmt.Sprintf("FROM: %sAre you Okay?", fromTime),
+			Label:     fmt.Sprintf("FROM: %d/%d/%d %d:%d からでいいですか？", fromTime.Year(), fromTime.Local().Month(), fromTime.Day(), fromTime.Hour(), fromTime.Local().Minute()),
 			IsConfirm: true,
 		}
-		_, err = fromConfirmPrompt.Run()
+		yes, err := fromConfirmPrompt.Run()
 		if err != nil {
 			fmt.Printf("failed %v\n", err)
 			return
 		}
-		if true {
+		if yes == "y" {
 			years = years[fromYearIdx:]
 			fromUnixTime = fromTime.Unix()
 			break
@@ -203,10 +203,23 @@ func main() {
 
 		toUnixTime = toTime.Unix()
 
-		if fromUnixTime < toUnixTime {
+		if fromUnixTime >= toUnixTime {
+			fmt.Println("!! 過去は選べないよ !!")
+			continue
+		}
+
+		toConfirmPrompt := promptui.Prompt{
+			Label:     fmt.Sprintf("TO: %d/%d/%d %d:%d まででいいですか？", toTime.Year(), toTime.Local().Month(), toTime.Day(), toTime.Hour(), toTime.Local().Minute()),
+			IsConfirm: true,
+		}
+		yes, err := toConfirmPrompt.Run()
+		if err != nil {
+			fmt.Printf("failed %v\n", err)
+			return
+		}
+		if yes == "y" {
 			break
 		} else {
-			fmt.Println("!! 過去は選べないよ !!")
 			continue
 		}
 	}
